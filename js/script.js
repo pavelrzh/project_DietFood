@@ -99,11 +99,12 @@ setClock('.timer', deadLine);
 // MODAL
 
 const modalOpenBtn = document.querySelectorAll('[data-modal]'),
-        modal = document.querySelector('.modal'),
-        modalCloseBtn = document.querySelector('[data-close');
+        modal = document.querySelector('.modal');
+        
         
     function openModal() {
-        modal.classList.toggle('show');
+        modal.classList.add('show');
+        modal.classList.remove('hide');
         document.body.style.overflow = 'hidden';
         document.body.style.paddingRight = '23px';
         clearInterval(modalTimerId);
@@ -113,14 +114,14 @@ const modalOpenBtn = document.querySelectorAll('[data-modal]'),
     });
 
     function closeModal() {
-        modal.classList.toggle('show');
+        modal.classList.add('hide');
+        modal.classList.remove('show');
         document.body.style.overflow = '';
         document.body.style.paddingRight = '';
     }
-    modalCloseBtn.addEventListener('click', closeModal);
 
     modal.addEventListener('click', (event) => {
-        if (event.target === modal) {
+        if (event.target === modal || event.target.getAttribute('data-close') == '') {
             closeModal();
         }
     });
@@ -130,7 +131,7 @@ const modalOpenBtn = document.querySelectorAll('[data-modal]'),
         }
     });
 
-    const modalTimerId = setTimeout(openModal, 3000);
+    const modalTimerId = setTimeout(openModal, 60000);
 
 
     function openModalByScroll() {
@@ -223,7 +224,7 @@ new MenuCard (
 const forms = document.querySelectorAll('form');
 
 const message = {
-    loading: 'Загрузка',
+    loading: 'img/form/spinner.svg',
     success: 'Спасибо, мы скоро свяжемся с вами',
     failure: 'Что-то пошло не так...' 
 };
@@ -236,17 +237,19 @@ function postData(form) {
     form.addEventListener('submit', (e) => {
         e.preventDefault();
 
-        const statusMessage = document.createElement('div');
-        statusMessage.classList.add('status');
-        statusMessage.textContent = message.loading;
-        form.append(statusMessage);
+        const statusMessage = document.createElement('img');
+        statusMessage.src = message.loading;
+        statusMessage.style.cssText = `
+            display: block;
+            margin: 0 auto;
+        `;
 
-
+        form.insertAdjacentElement('afterend', statusMessage);
 
         const request = new XMLHttpRequest();
         request.open('POST', 'server.php');
 
-       request.setRequestHeader('Content-type', 'application/json');
+        request.setRequestHeader('Content-type', 'application/json');
         const formData = new FormData(form);
 
         const object = {};
@@ -261,18 +264,40 @@ function postData(form) {
         request.addEventListener('load', () => {
             if (request.status === 200) {
                 console.log(request.response);
-                statusMessage.textContent = message.success;
+                showThanksModal(message.success);
+                statusMessage.remove();
                 form.reset();
-                setTimeout(() =>{
-                    statusMessage.remove();
-                }, 2000);
             } else {
-                statusMessage.textContent = message.failure;
+                showThanksModal(message.failure);
             }
         });
 
     });
 
+}
+
+function showThanksModal(message) {
+    const prevModalDialog = document.querySelector('.modal__dialog');
+    
+    prevModalDialog.classList.add('hide');
+    
+    openModal();
+
+    const thanksModal = document.createElement('div');
+    thanksModal.classList.add('modal__dialog');
+    thanksModal.innerHTML = `
+            <div class="modal__content">
+                <div class="modal__close" data-close>×</div>
+                <div class="modal__title">${message}</div>
+            </div>
+        `;
+    document.querySelector('.modal').append(thanksModal);
+    setTimeout(() => {
+        thanksModal.remove();
+        prevModalDialog.classList.add('show');
+        prevModalDialog.classList.remove('hide');
+        closeModal();
+    }, 4000);
 }
 
 

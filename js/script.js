@@ -42,7 +42,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // deadLine.setDate(deadLine.getDate() + 3); // устанавливаем дату на плюс 3 дня. Сбрасывается каждый раз при обновлении страницы
 
 
-
     /* Проверка текущей даты на превышение дедлайна (вcтавить в let t=checkZero(Date.parse.....)*/
 
     // function checkZero(num) {
@@ -187,36 +186,54 @@ class MenuCard {
     }
 }
 
-new MenuCard (
-    "img/tabs/vegy.jpg",
-    "vegy",
-    "Меню 'Фитнес'",
-    "Меню 'Фитнес' - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!",
-    10,
-    ".menu .container",
-    "menu__item",
+const getResource = async (url) => {                     // отвечает за (GET) получение данных (MenuCard) с сервера
+    const res = await fetch(url);
 
-).render();
+    if(!res.ok) {
+        throw new Error(`Could not fetch ${url}, status ${res.status} `);
+    }
+    return await res.json();
+};        
 
-new MenuCard (
-    "img/tabs/post.jpg",
-    "post",
-    "Меню 'Постное'",
-    "Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.",
-    11,
-    ".menu .container",
-    "menu__item",
-).render();
+getResource('http://localhost:3000/menu')                               // получаем с сервера массив, который содержит
+    .then(data => {                                                     // объекты (карточки меню), перебираем массив, деструктуризируем,
+        data.forEach(({img, altimg, title, descr, price}) => {          // передаем в конструктор, который рендерит на сайт      
+            new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
+        });
+    });
 
-new MenuCard (
-    "img/tabs/elite.jpg",
-    "elite",
-    "Меню 'Премиум'",
-    "В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!",
-    12,
-    ".menu .container",
-    "menu__item",
-).render();
+
+// new MenuCard (                                               // оставил, для понимания как вручную создавал карточки
+//     "img/tabs/vegy.jpg",
+//     "vegy",
+//     "Меню 'Фитнес'",
+//     "Меню 'Фитнес' - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!",
+//     10,
+//     ".menu .container",
+//     "menu__item",
+// ).render();
+
+// new MenuCard (
+//     "img/tabs/post.jpg",
+//     "post",
+//     "Меню 'Постное'",
+//     "Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.",
+//     11,
+//     ".menu .container",
+//     "menu__item",
+// ).render();
+
+// new MenuCard (
+//     "img/tabs/elite.jpg",
+//     "elite",
+//     "Меню 'Премиум'",
+//     "В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!",
+//     12,
+//     ".menu .container",
+//     "menu__item",
+// ).render();
+
+
 
 
 // FORMS POST
@@ -230,10 +247,22 @@ const message = {
 };
 
 forms.forEach(item => {
-    postData(item);
+    bindPostData(item);
 });
 
-function postData(form) {
+
+const postData = async (url, data) => {                     // отвечает за постинг данных на сервер
+    const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-type': 'application/json'
+            },
+        body: data,
+    });
+    return await res.json();
+};                                       
+
+function bindPostData(form) {                           // отвечает за привязку постинга
     form.addEventListener('submit', (e) => {
         e.preventDefault();
 
@@ -246,30 +275,19 @@ function postData(form) {
 
         form.insertAdjacentElement('afterend', statusMessage);
 
-        const request = new XMLHttpRequest();
-        request.open('POST', 'server.php');
-
-        request.setRequestHeader('Content-type', 'application/json');
         const formData = new FormData(form);
 
-        const object = {};
-        formData.forEach((value, key) => {
-            object[key] = value;
-        });
+        const json = JSON.stringify(Object.fromEntries(formData.entries()));
 
-        const json = JSON.stringify(object);
-
-        request.send(json);
-
-        request.addEventListener('load', () => {
-            if (request.status === 200) {
-                console.log(request.response);
-                showThanksModal(message.success);
-                statusMessage.remove();
-                form.reset();
-            } else {
-                showThanksModal(message.failure);
-            }
+        postData('http://localhost:3000/requests', json)
+        .then(data => {
+            console.log(data);
+            showThanksModal(message.success);
+            statusMessage.remove();
+        }).catch(() => {
+            showThanksModal(message.failure);
+        }).finally (()=> {
+            form.reset();
         });
 
     });
@@ -300,5 +318,53 @@ function showThanksModal(message) {
     }, 4000);
 }
 
+// SLIDER 
+
+const slides = document.querySelectorAll('.offer__slide'),
+    prevArrow = document.querySelector('.offer__slider-prev'),
+    nextArrow = document.querySelector('.offer__slider-next'),
+    current = document.querySelector('#current'),
+    total = document.querySelector('#total');
+    
+let slideIndex = 1;
+showSlide(slideIndex);                                            // инициализируем слайдер
+
+if (slides.length < 10){
+    total.textContent = `0${slides.length}`;
+} else {
+    total.textContent = slides.length;
+}
+
+
+
+function showSlide(n) {
+    if (n > slides.length) {
+        slideIndex = 1;
+    }
+    if (n < 1) {
+        slideIndex = slides.length;
+    }
+
+    slides.forEach(item => item.style.display = 'none');
+    slides[slideIndex - 1].style.display = 'block';
+
+    if (slideIndex < 10){
+        current.textContent = `0${slideIndex}`;
+    } else {
+        current.textContent = slideIndex;
+    }
+}
+
+function countSlide(n) {
+    showSlide(slideIndex += n);
+}
+
+
+nextArrow.addEventListener('click', () => {
+    countSlide(1);
+});
+prevArrow.addEventListener('click', () => {
+    countSlide(-1);
+});
 
 });

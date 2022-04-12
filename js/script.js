@@ -423,7 +423,6 @@ for (let i = 0; i < slides.length; i++) {                                   // �
 }
 
 
-
 nextArrow.addEventListener('click', () => {
     if (offset == +(width.slice(0, width.length - 2) * (slides.length - 1))) {
         offset = 0;
@@ -441,8 +440,6 @@ nextArrow.addEventListener('click', () => {
     addZeroCurrentSlide();                                          // ноль перед цифрой current если слайдов меньше 10 
 
     dotActive();                                                    // активный дот при перелистывании стрелкой
-    
-   
     
 
 });
@@ -492,6 +489,5 @@ function addZeroCurrentSlide() {                                  // ф-я до�
         current.textContent =  slideIndex;
     }
 }
-
 
 });

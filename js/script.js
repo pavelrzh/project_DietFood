@@ -383,7 +383,7 @@ const slides = document.querySelectorAll('.offer__slide'),
 let slideIndex = 1;
 let offset = 0;
 
-if (slides.length < 10) {
+if (slides.length < 10) {                                           // ноль перед total если слайдов меньше 10
     total.textContent = `0${slides.length}`;
 } else {
     total.textContent = slides.length;
@@ -424,10 +424,10 @@ for (let i = 0; i < slides.length; i++) {                                   // �
 
 
 nextArrow.addEventListener('click', () => {
-    if (offset == +(width.slice(0, width.length - 2) * (slides.length - 1))) {
+    if (offset == deleteNoDigits(width) * (slides.length - 1)) {
         offset = 0;
     } else {
-        offset += +(width.slice(0, width.length - 2));
+        offset += deleteNoDigits(width);
     }
 
     slidesInner.style.transform = `translateX(-${offset}px)`;
@@ -445,10 +445,10 @@ nextArrow.addEventListener('click', () => {
 });
 prevArrow.addEventListener('click', () => {
     if (offset == 0) {
-        offset = +width.slice(0, width.length - 2) * (slides.length - 1);
+        offset = deleteNoDigits(width) * (slides.length - 1);
 
     } else {
-        offset -= +width.slice(0, width.length - 2);
+        offset -= deleteNoDigits(width);
     }
 
     slidesInner.style.transform = `translateX(-${offset}px)`;
@@ -468,7 +468,7 @@ dots.forEach(item  => {                                              // реал
         const slideTo = e.target.getAttribute('data-slide-to');
         slideIndex = slideTo;
 
-        offset = +width.slice(0, width.length - 2) * (slideTo - 1);
+        offset = deleteNoDigits(width) * (slideTo - 1);
         slidesInner.style.transform = `translateX(-${offset}px)`;
 
 
@@ -489,5 +489,10 @@ function addZeroCurrentSlide() {                                  // ф-я до�
         current.textContent =  slideIndex;
     }
 }
+
+function deleteNoDigits(str) {                                  // ф-я удаления НЕ цифр из строки(напр."500px" => 500)
+        return Math.round(+str.replace(/[^\d.]/g, ''));
+    }
+
 
 });

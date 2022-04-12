@@ -318,53 +318,166 @@ function showThanksModal(message) {
     }, 4000);
 }
 
-// SLIDER 
+// SLIDER v.1
+
+// const slides = document.querySelectorAll('.offer__slide'),
+//     prevArrow = document.querySelector('.offer__slider-prev'),
+//     nextArrow = document.querySelector('.offer__slider-next'),
+//     current = document.querySelector('#current'),
+//     total = document.querySelector('#total');
+    
+// let slideIndex = 1;
+// showSlide(slideIndex);                                            // инициализируем слайдер
+
+// if (slides.length < 10){
+//     total.textContent = `0${slides.length}`;
+// } else {
+//     total.textContent = slides.length;
+// }
+
+
+// function showSlide(n) {
+//     if (n > slides.length) {
+//         slideIndex = 1;
+//     }
+//     if (n < 1) {
+//         slideIndex = slides.length;
+//     }
+
+
+//     slides.forEach(item => item.classList.add('hide'));
+//     slides[slideIndex - 1].classList.remove('hide');
+
+//     if (slideIndex < 10){
+//         current.textContent = `0${slideIndex}`;
+//     } else {
+//         current.textContent = slideIndex;
+//     }
+// }
+
+// function countSlide(n) {
+//     showSlide(slideIndex += n);
+// }
+
+
+// nextArrow.addEventListener('click', () => {
+//     countSlide(1);
+// });
+// prevArrow.addEventListener('click', () => {
+//     countSlide(-1);
+// });
+
+
+// SLIDER V.2
 
 const slides = document.querySelectorAll('.offer__slide'),
     prevArrow = document.querySelector('.offer__slider-prev'),
     nextArrow = document.querySelector('.offer__slider-next'),
     current = document.querySelector('#current'),
-    total = document.querySelector('#total');
-    
-let slideIndex = 1;
-showSlide(slideIndex);                                            // инициализируем слайдер
+    total = document.querySelector('#total'),
+    slidesWrapper = document.querySelector('.offer__slider-wrapper'),
+    width = window.getComputedStyle(slidesWrapper).width,
+    slidesInner = document.querySelector('.offer__slide-inner'),
+    sliderOffer = document.querySelector('.offer__slider');
 
-if (slides.length < 10){
+let slideIndex = 1;
+let offset = 0;
+
+if (slides.length < 10) {
     total.textContent = `0${slides.length}`;
 } else {
     total.textContent = slides.length;
+}    
+if (slideIndex < 10) {
+    current.textContent = `0${slideIndex}`;
+} else {
+    current.textContent =  slideIndex;
 }
 
 
+slidesInner.style.width = 100 * slides.length + '%';
+slidesInner.style.display = 'flex';
+slidesWrapper.style.overflow = 'hidden';
+slidesInner.style.transition = '.5s all';
 
-function showSlide(n) {
-    if (n > slides.length) {
-        slideIndex = 1;
-    }
-    if (n < 1) {
-        slideIndex = slides.length;
-    }
+slides.forEach(item => {
+    item.style.width = width;
+});
 
-    slides.forEach(item => item.style.display = 'none');
-    slides[slideIndex - 1].style.display = 'block';
 
-    if (slideIndex < 10){
-        current.textContent = `0${slideIndex}`;
-    } else {
-        current.textContent = slideIndex;
+sliderOffer.style.position = 'relative';                                    // создаем обертку пагинации
+
+const indicators = document.createElement('ol'),
+        dots = [];
+
+indicators.classList.add('pagination-indicators');
+
+sliderOffer.append(indicators);
+
+for (let i = 0; i < slides.length; i++) {                                   // создаем пагинацию (точки)
+    const dot = document.createElement('li');
+    dot.classList.add('dot');
+    dot.setAttribute('data-slide-to', i + 1);
+    indicators.append(dot);
+    if (i == 0) {                                                          // первый дот - активный 
+        dot.classList.add('active-dot');
     }
+    dots.push(dot);
 }
 
-function countSlide(n) {
-    showSlide(slideIndex += n);
-}
 
 
 nextArrow.addEventListener('click', () => {
-    countSlide(1);
+    if (offset == +(width.slice(0, width.length - 2) * (slides.length - 1))) {
+        offset = 0;
+    } else {
+        offset += +(width.slice(0, width.length - 2));
+    }
+
+    slidesInner.style.transform = `translateX(-${offset}px)`;
+
+    if (slideIndex == slides.length) {
+        slideIndex = 1;
+    } else {
+        slideIndex++;
+    }
+    if (slideIndex < 10) {
+        current.textContent =  `0${slideIndex}`;
+    } else {
+        current.textContent =  slideIndex;
+    }
+
+    dots.forEach(item => item.classList.remove('active-dot'));          // активный дот при перелистывании стрелкой
+    dots[slideIndex - 1].classList.add('active-dot');
+   
+    
+
 });
 prevArrow.addEventListener('click', () => {
-    countSlide(-1);
+    if (offset == 0) {
+        offset = +width.slice(0, width.length - 2) * (slides.length - 1);
+
+    } else {
+        offset -= +width.slice(0, width.length - 2);
+    }
+
+    slidesInner.style.transform = `translateX(-${offset}px)`;
+
+    if (slideIndex == 1) {
+        slideIndex = slides.length;
+    } else {
+        slideIndex--;
+    }
+    if (slideIndex < 10) {
+        current.textContent = `0${slideIndex}`;
+    } else {
+        current.textContent =  slideIndex;
+    }
+    dots.forEach(item => item.classList.remove('active-dot'));          // активный дот при перелистывании стрелкой
+    dots[slideIndex - 1].classList.add('active-dot');
+   
 });
+
+
 
 });

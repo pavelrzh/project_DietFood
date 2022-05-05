@@ -1,6 +1,6 @@
 //TIMER 
 
-function timer() {
+function timer(id, deadLine) {
     // const deadLine = new Date(); // присваиваем переменной текущую дату
     // deadLine.setDate(deadLine.getDate() + 3); // устанавливаем дату на плюс 3 дня. Сбрасывается каждый раз при обновлении страницы
 
@@ -13,7 +13,6 @@ function timer() {
     //     } return num;
     // }
 
-    const deadLine = '2022-12-31';
 
     function getTimeRemain(endtime) {
         let days, hours, minutes, secondes;
@@ -65,6 +64,6 @@ function timer() {
         }
     }
 
-setClock('.timer', deadLine);
+setClock(id, deadLine);
 }
 export default timer;

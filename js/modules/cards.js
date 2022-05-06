@@ -44,9 +44,9 @@ function cards() {
             this.parent.append(element);
         }
     }
-    
-    
-    getResource('http://localhost:3000/menu')                               // получаем с сервера массив, который содержит
+    // http://localhost:3000/menu
+    // https://github.com/pavelrzh/project_DietFood/blob/master/db.json
+    getResource('https://github.com/pavelrzh/project_DietFood/blob/master/db.json/menu')                               // получаем с сервера массив, который содержит
         .then(data => {                                                     // объекты (карточки меню), перебираем массив, деструктуризируем,
             data.forEach(({img, altimg, title, descr, price}) => {          // передаем в конструктор, который рендерит на сайт      
                 new MenuCard(img, altimg, title, descr, price, '.menu .container').render();

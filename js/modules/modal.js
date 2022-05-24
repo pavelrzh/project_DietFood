@@ -1,11 +1,30 @@
 // MODAL
 
+/* Компенсация скрола */
+function calcScroll() {
+    let div = document.createElement('div');
+
+    div.style.width = '50px';
+    div.style.height = '50px';
+    div.style.overflowY = 'scroll';
+    div.style.visibility = 'hidden';
+
+    document.body.append(div);
+    let scrollWidth = div.offsetWidth - div.clientWidth;
+    div.remove();
+
+    return scrollWidth;
+}
+
+
 function openModal(modalSelector, modalTimerId) {
     const modal = document.querySelector(modalSelector);
+    const scroll = calcScroll();
+
     modal.classList.add('show');
     modal.classList.remove('hide');
     document.body.style.overflow = 'hidden';
-    document.body.style.paddingRight = '23px';
+    document.body.style.marginRight = `${scroll}px`;
 
     if (modalTimerId) {
         clearInterval(modalTimerId);
@@ -16,7 +35,7 @@ function closeModal(modalSelector) {
     modal.classList.add('hide');
     modal.classList.remove('show');
     document.body.style.overflow = '';
-    document.body.style.paddingRight = '';
+    document.body.style.marginRight = '0px';
 }
 
 function modal(triggerSelector, modalSelector, modalTimerId) {

@@ -1,18 +1,6 @@
 //TIMER 
 
 function timer(id, deadLine) {
-    // const deadLine = new Date(); // присваиваем переменной текущую дату
-    // deadLine.setDate(deadLine.getDate() + 3); // устанавливаем дату на плюс 3 дня. Сбрасывается каждый раз при обновлении страницы
-
-
-    /* Проверка текущей даты на превышение дедлайна (вcтавить в let t=checkZero(Date.parse.....)*/
-
-    // function checkZero(num) {
-    //     if (num < 0) {
-    //         num = 0;
-    //     } return num;
-    // }
-
 
     function getTimeRemain(endtime) {
         let days, hours, minutes, secondes;
@@ -59,6 +47,11 @@ function timer(id, deadLine) {
                 secondes.innerHTML = t.secondes;
 
             if (t.total <= 0) {
+                days.innerHTML = "00";
+                hours.innerHTML = "00";
+                minutes.innerHTML = "00";
+                secondes.innerHTML = "00";
+
                 clearInterval(timeInterval);
             }
         }

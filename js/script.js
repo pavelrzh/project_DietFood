@@ -13,6 +13,7 @@ import {openModal} from './modules/modal';
 document.addEventListener('DOMContentLoaded', function() {
     const modalTimerId = setTimeout(() => openModal('.modal', modalTimerId), 6000); 
 
+
     tabs('.tabheader__item', '.tabcontent', '.tabheader__items', 'tabheader__item_active');
     calc();
     cards();

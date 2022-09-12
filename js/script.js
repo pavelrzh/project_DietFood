@@ -30,6 +30,6 @@ document.addEventListener('DOMContentLoaded', function() {
         field: '.offer__slide-inner'
 
     });
-    timer('.timer', '2022-10-18');
+    timer('.timer', '2023-05-18');
 
 });
